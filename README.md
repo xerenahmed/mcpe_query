@@ -4,7 +4,7 @@ A library to get information of minecraft using the status ping https://wiki.vg/
 
 ## Installation
 ```toml
-mcpe_query = "0.1.0"
+mcpe_query = "0.1.1"
 ```
 
 ## Usage
