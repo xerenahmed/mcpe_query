@@ -1,0 +1,12 @@
+[package]
+name = "mcpe_query"
+edition = "2021"
+version = "0.1.0"
+description = "A library to get information of minecraft using the status ping [https://wiki.vg/Server_List_Ping#Client_to_server]"
+repository = "https://github.com/xerenahmed/mcpe-query/blob/main/Cargo.toml"
+license = "MIT"
+
+[dependencies]
+anyhow = "1.0.57"
+byteorder = "1"
+rand = "0.8.5"
