@@ -6,19 +6,49 @@ Rust port of [gophertunnel/query](https://github.com/Sandertv/gophertunnel/tree/
 A library to get information of minecraft using the status ping https://wiki.vg/Server_List_Ping#Client_to_server
 
 ## Installation
+
 ```toml
 mcpe_query = "0.1.1"
 ```
 
-## Usage
-```rust
-use mcpe_query::query::handle;
+## Basic Usage
 
-fn main() {
-    let uri = "play.redmc.me:19132".to_string();
-    let timeout = Some(std::time::Duration::from_secs(5));
-    
-    let info = handle(uri, timeout).unwrap();
-    println!("{:?}", info);
+Default timeout is 5 seconds for query.
+
+```rust
+let uri = "play.redmc.me:19132";
+let info = mcpe_query::handle(uri, None).unwrap();
+println!("{:?}", info);
+```
+
+### Timeout
+
+```rust
+let uri = "play.redmc.me:19132";
+let timeout = std::time::Duration::from_secs(10); // 10 seconds
+let info = mcpe_query::handle(uri, Some(timeout)).unwrap();
+println!("{:?}", info);
+```
+
+## Example Repsonse Information
+
+```
+Information {
+	players: ["Arial w", "darly4990", "LegendAdam3456", "BugraBcrr00", "RTshadow6686"],
+	other: {
+		"hostip": "0.0.0.0",
+		"maxplayers": "60",
+		"hostport": "19132",
+		"hostname": "RedMC",
+		"numplayers": "10",
+		"map": "Spawn",
+		"plugins": "PocketMine-MP 4.7.1+dev",
+		"gametype": "SMP",
+		"version": "v1.19.21",
+		"server_engine": "PocketMine-MP 4.7.1+dev",
+		"whitelist": "off",
+		"game_id": "MINECRAFTPE"
+	}
 }
 ```
+

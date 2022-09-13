@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Result};
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 use std::collections::HashMap;
-use std::io::{BufReader, BufWriter, Cursor, Read, Write};
+use std::io::{Cursor, Read, Write};
 
 const VERSION: [u8; 2] = [0xfe, 0xfd];
 
@@ -53,30 +53,26 @@ impl Request {
 }
 
 pub trait Marshaller {
-    fn marshall(&self, writer: &mut BufWriter<Vec<u8>>) -> Result<()>;
-    fn unmarshall(&mut self, reader: &mut BufReader<Cursor<Vec<u8>>>) -> Result<()>;
+    fn marshall(&self, writer: &mut Vec<u8>) -> Result<()>;
+    fn unmarshall(&mut self, reader: &mut Cursor<Vec<u8>>) -> Result<()>;
 }
 
 impl Marshaller for Request {
-    fn marshall(&self, writer: &mut BufWriter<Vec<u8>>) -> Result<()> {
-        writer.write_all(&VERSION)?;
+    fn marshall(&self, wtr: &mut Vec<u8>) -> Result<()> {
+        wtr.write_all(&VERSION)?;
 
-        let mut wtr = vec![];
         wtr.write_u8(self.request_type)?;
         wtr.write_i32::<BigEndian>(self.sequence_number)?;
-        writer.write_all(&wtr)?;
 
         if self.request_type == QUERY_TYPE_INFORMATION {
-            let mut wtr = vec![];
             wtr.write_i32::<BigEndian>(self.response_number)?;
-            writer.write_all(&wtr)?;
-            writer.write_all(&PADDING)?;
+            wtr.write_all(&PADDING)?;
         }
 
         Ok(())
     }
 
-    fn unmarshall(&mut self, reader: &mut BufReader<Cursor<Vec<u8>>>) -> Result<()> {
+    fn unmarshall(&mut self, reader: &mut Cursor<Vec<u8>>) -> Result<()> {
         let mut v: [u8; 2] = [0x0, 0x0];
         reader.read_exact(&mut v)?;
 
@@ -100,24 +96,20 @@ impl Marshaller for Request {
 }
 
 impl Marshaller for Response {
-    fn marshall(&self, writer: &mut BufWriter<Vec<u8>>) -> Result<()> {
-        let mut wtr = vec![];
+    fn marshall(&self, wtr: &mut Vec<u8>) -> Result<()> {
         wtr.write_u8(self.response_type)?;
         wtr.write_i32::<BigEndian>(self.sequence_number)?;
-        writer.write_all(&wtr)?;
 
         if self.response_type == QUERY_TYPE_HANDSHAKE {
             let mut v = self.response_number.to_string().into_bytes();
             if v.len() != 12 {
                 v.resize(12, 0);
             }
-            writer.write_all(&v)?;
+            wtr.write_all(&v)?;
         } else {
-            writer.write_all(&SPLIT_NUM)?;
-            let mut wtr = vec![];
+            wtr.write_all(&SPLIT_NUM)?;
             wtr.write_u8(0x80)?;
             wtr.write_u8(0)?;
-            writer.write_all(&wtr)?;
 
             let mut values: Vec<Vec<u8>> = Vec::new();
             for (key, value) in self.information.other.clone().into_iter() {
@@ -125,13 +117,13 @@ impl Marshaller for Response {
                 values.push(value.into_bytes());
             }
             let values_bytes = values.join(&0);
-            writer.write_all(values_bytes.as_slice())?;
+            wtr.write_all(values_bytes.as_slice())?;
         }
 
         Ok(())
     }
 
-    fn unmarshall(&mut self, reader: &mut BufReader<Cursor<Vec<u8>>>) -> Result<()> {
+    fn unmarshall(&mut self, reader: &mut Cursor<Vec<u8>>) -> Result<()> {
         self.response_type = reader.read_u8()?;
         self.sequence_number = reader.read_i32::<BigEndian>()?;
 
