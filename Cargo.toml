@@ -3,7 +3,7 @@ name = "mcpe_query"
 edition = "2021"
 version = "0.1.2"
 description = "A library to get information of minecraft using the status ping [https://wiki.vg/Server_List_Ping#Client_to_server]"
-repository = "https://github.com/xerenahmed/mcpe_query/blob/main/Cargo.toml"
+repository = "https://github.com/xerenahmed/mcpe_query"
 license = "MIT"
 
 [dependencies]

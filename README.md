@@ -6,9 +6,9 @@ Rust port of [gophertunnel/query](https://github.com/Sandertv/gophertunnel/tree/
 A library to get information of minecraft using the status ping https://wiki.vg/Server_List_Ping#Client_to_server
 
 ## Installation
-
+Add to Cargo.toml [depencidies]
 ```toml
-mcpe_query = "0.1.1"
+mcpe_query = "0.1.2"
 ```
 
 ## Basic Usage
